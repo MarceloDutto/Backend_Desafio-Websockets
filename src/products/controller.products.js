@@ -20,7 +20,7 @@ export const getProducts = async () => {
 
 export const addProduct = async (params) => {
     const { title, description, code, price, status=true, stock, category } = params;
-    if(!title || !description || !code || !price || typeof(status) !== 'boolean' || !stock || !category) return {success: false, httpStatus:400, message: 'Error en los campos ingresados'};
+    if(!title || !description || !code || !price || typeof(status) !== 'boolean' || !stock || !category) return {success: false, httpStatus:400, message: 'Error en los campos ingresados', allProducts};
 
     if(!existsSync(path)) {
         allProducts = []
@@ -30,11 +30,11 @@ export const addProduct = async (params) => {
             allProducts = JSON.parse(data);
         } catch (error) {
             console.log(error);
-            return {success:false, httpStatus:500, message: 'Error al acceder a la base de datos'};
+            return {success:false, httpStatus:500, message: 'Error al acceder a la base de datos', allProducts};
         }
     }
 
-    if(allProducts.find(prod => prod.code === code)) return {success: false, httpStatus:400, message: 'El producto ya se encuentra ingresado'};
+    if(allProducts.find(prod => prod.code === code)) return {success: false, httpStatus:400, message: 'El producto ya se encuentra ingresado', allProducts};
 
     const IdArray = allProducts.map(prod => prod.id);
     const maxId = Math.max(...IdArray);
@@ -57,7 +57,7 @@ export const addProduct = async (params) => {
         if(error) throw error;
     });
 
-    return {success: true, httpStatus:200, message: 'El producto fue creado exitosamente'};
+    return {success: true, httpStatus:200, message: 'El producto fue creado exitosamente', allProducts};
 }
 
 export const deleteProduct = async (id) => {

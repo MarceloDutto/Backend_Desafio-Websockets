@@ -28,8 +28,15 @@ const httpServer = app.listen(port, () => {
     console.log(`Server running at ${port}`);
 })
 
-const io = new Server(httpServer);
+export const io = new Server(httpServer);
 
-io.on('connection', socket => {
-    console.log(`New client connected wtih id ${socket.id}`);
-})
+/* io.on('connection', socket => {
+    console.log(`New client connected with id ${socket.id}`);
+
+    io.on('newProduct', allProducts => {
+        io.broadcast.emit('refreshProducts', allProducts);
+    })
+}); */
+
+
+
