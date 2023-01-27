@@ -15,7 +15,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(morgan('dev'));
 
 app.engine('handlebars', handlebars.engine({
-    defaultLayout: ''
+    defaultLayout: '' //Nota: Esto lo tengo que agregar porque si no me lanza un error de que no encuentra la ruta.
 }));
 
 app.set('views', __dirname + '/views');
@@ -29,14 +29,3 @@ const httpServer = app.listen(port, () => {
 })
 
 export const io = new Server(httpServer);
-
-/* io.on('connection', socket => {
-    console.log(`New client connected with id ${socket.id}`);
-
-    io.on('newProduct', allProducts => {
-        io.broadcast.emit('refreshProducts', allProducts);
-    })
-}); */
-
-
-

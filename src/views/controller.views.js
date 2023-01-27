@@ -1,6 +1,5 @@
 import { Router } from 'express';
-/* import { io } from 'socket.io-client'; */
-import { getProducts, addProduct, deleteProduct } from '../products/controller.products.js';
+import { getProducts, addProduct, deleteProduct } from '../products/productsManager.js';
 import { io } from '../app.js'
 
 const router = Router();
@@ -21,46 +20,44 @@ router.get('/', async (req, res) => {
 
 router.get('/realtimeproducts', async (req, res) => {
 
-    io.on('connect', (socket) => {
+    io.on('connection', socket => {
         console.log(`New client connected with id ${socket.id}`);  
-        
     })
     
     const products = await getProducts();
 
-    if(products === []) return res.status(500).render('home.handlebars', {
+    if(products === []) return res.status(500).render('realTimeProducts.handlebars', {
         showProducts: false});
     
-    res.render("home.handlebars", {
+    res.render("realTimeProducts.handlebars", {
         showProducts: true,
         products
     })
 })
 
-router.post('/realtimeproducts', (req, res) => {
-    const returned = addProduct(req.body);
-    const { success, httpStatus, message, allProducts } = returned;
+router.post('/realtimeproducts', async (req, res) => {
 
-    if(success === false) return res.status(httpStatus).render('realTimeProducts.handlebars', {
-        showProducts: false,
-        addProductMessage: message
-    })
-
-    io.emit('newProduct', allProducts)
-
-    res.render('realTimeProducts.handlebars', {
-        showProducts: true,
-        addProductMessage: message
-    })
-
-
+    try {
+        const allProducts = await addProduct(req.body);
+        io.emit('newProduct', allProducts);
+        res.status(201).json({message: 'Producto creado'});
+    } catch(error) {
+        console.log(error);
+        res.status(500).json('No se puedo crear el producto');
+    }
 })
 
-/* router.delete("/realtimeproducts/:id", (req, res) => {
+router.delete("/realtimeproducts/:id", async (req, res) => {
     const { id } = req.params;
 
-    const returned = deleteProduct(id);
-    const { success, httpStatus, message } = returned;
-}) */
+    try {
+        const allProducts = await deleteProduct(parseInt(id));
+        io.emit('productDeleted', allProducts);
+        res.json(({message: 'Producto eliminado'}));
+    } catch(error) {
+        console.log(error);
+        res.status(500).json('No se pudo eliminar el producto');
+    }
+})
 
 export default router;

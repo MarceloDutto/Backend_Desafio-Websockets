@@ -10,17 +10,17 @@ export const getProducts = async () => {
     try {
         const data = await promises.readFile(path, 'utf-8');
         allProducts = JSON.parse(data);
-        return allProducts;
-
     } catch (error) {
         console.log(error);
-        return allProducts = [];
+        return allProducts = []
     }
+
+    return allProducts;
 }
 
 export const addProduct = async (params) => {
     const { title, description, code, price, status=true, stock, category } = params;
-    if(!title || !description || !code || !price || typeof(status) !== 'boolean' || !stock || !category) return {success: false, httpStatus:400, message: 'Error en los campos ingresados', allProducts};
+    if(!title || !description || !code || !price || typeof(status) !== 'boolean' || !stock || !category) return allProducts;
 
     if(!existsSync(path)) {
         allProducts = []
@@ -30,11 +30,11 @@ export const addProduct = async (params) => {
             allProducts = JSON.parse(data);
         } catch (error) {
             console.log(error);
-            return {success:false, httpStatus:500, message: 'Error al acceder a la base de datos', allProducts};
+            return allProducts = [];
         }
     }
 
-    if(allProducts.find(prod => prod.code === code)) return {success: false, httpStatus:400, message: 'El producto ya se encuentra ingresado', allProducts};
+    if(allProducts.find(prod => prod.code === code)) return allProducts;
 
     const IdArray = allProducts.map(prod => prod.id);
     const maxId = Math.max(...IdArray);
@@ -57,22 +57,22 @@ export const addProduct = async (params) => {
         if(error) throw error;
     });
 
-    return {success: true, httpStatus:200, message: 'El producto fue creado exitosamente', allProducts};
+    return allProducts;
 }
 
 export const deleteProduct = async (id) => {
-    if(!existsSync(path)) return {success: false, httpStatus: 404, message: 'No existe la base de datos'};
+    if(!existsSync(path)) return allProducts = [];
 
     try {
         const data = await promises.readFile(path, 'utf-8');
         allProducts = JSON.parse(data);
     } catch (error) {
         console.log(error);
-        return {success: false, httpStatus:500, message: 'Error al acceder a la base de datos'};
+        return allProducts;
     }
 
     const indexById = allProducts.findIndex(prod => prod.id === id);
-    if(indexById === -1) return {success: false, httpStatus: 404, message: 'No se encontró el producto'};
+    if(indexById === -1) return allProducts;
     allProducts.splice(indexById, 1);
 
     const productStr = JSON.stringify(allProducts, null, 2);
@@ -80,6 +80,6 @@ export const deleteProduct = async (id) => {
             if(error) throw error;
         });
 
-    return {success: true, httpStatus:200, message: 'Producto eliminado'}
+    return allProducts
 } 
 
